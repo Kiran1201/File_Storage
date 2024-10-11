@@ -1,26 +1,34 @@
 import './App.css';
 import LoginPage from './component/login/LoginPage';
-import MainLayout from './component/Pages/MainLayout';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { CssBaseline } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useState } from 'react';
-import AppRouter from './component/routers/AppRouter';
+import MainLayout from './component/Pages/MainLayout';
+import Header from './component/Pages/Header';
+import Footer from './component/Pages/Footer';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Handle login success
   const handleLogin = () => {
     setIsLoggedIn(true);
   };
 
   return (
-    <div className="main-content"> {/* Main content area */}
-      {!isLoggedIn ? (
-        <LoginPage onLogin={handleLogin} />
-      ) : (
-        <AppRouter />,
-        <MainLayout />
-      )}
+    <div className='app-container'>
+      <Header />
+      <Router>
+        <CssBaseline />
+        <div className='main-content'>
+          {!isLoggedIn ? (
+            <LoginPage onLogin={handleLogin} />
+          ) : (
+            <MainLayout />
+          )}
+        </div>
+      </Router>
+      <Footer />
     </div>
   );
 }

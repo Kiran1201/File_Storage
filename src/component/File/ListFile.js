@@ -32,7 +32,6 @@ const ListFile = () => {
 
     };
 
-
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:8080/api/files/${id}`);

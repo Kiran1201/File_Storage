@@ -1,17 +1,17 @@
 import React from 'react';
 import { Box, Grid } from '@mui/material';
 import Sidebar from './Sidebar';
-import BodyContent from './BodyContent';
+import AppRouter from '../../AppRouter';
 
 const MainLayout = () => {
     return (
-        <Box sx={{ flexGrow: 1, paddingTop: '20px', color: '#87CEEB' }}>
+        <Box sx={{ flexGrow: 1 }} style={{ paddingTop: '20px' }}>
             <Grid container spacing={3}>
-                <Grid item xs={12} sm={3}>
-                    <Sidebar />
+                <Grid item xs={3}>
+                    <Sidebar /> {/* Sidebar with navigation links */}
                 </Grid>
-                <Grid item xs={12} sm={9}>
-                    <BodyContent />
+                <Grid item xs={9}>
+                    <AppRouter /> {/* Body content changes based on the route */}
                 </Grid>
             </Grid>
         </Box>

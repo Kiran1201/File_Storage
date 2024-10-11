@@ -11,7 +11,7 @@ const Sidebar = () => {
             elevation={3}
             sx={{
                 padding: '18px',
-                height: '95%',
+                height: '100%',
                 backgroundColor: 'lightblue',
                 borderRadius: '10px',
             }}
@@ -20,13 +20,25 @@ const Sidebar = () => {
                 Sidebar
             </Typography>
             <List>
-                <ListItem button component={Link} to="/file">
+                <ListItem button="true" component={Link} to="/racs">
+                    <ListItemIcon>
+                        <ListAltIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="RacList" />
+                </ListItem>
+                <ListItem button="true" component={Link} to="/folders">
+                    <ListItemIcon>
+                        <UploadFileIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="FolderList" />
+                </ListItem>
+                <ListItem button="true" component={Link} to="/files">
                     <ListItemIcon>
                         <ListAltIcon />
                     </ListItemIcon>
                     <ListItemText primary="FileList" />
                 </ListItem>
-                <ListItem button component = {Link} to = "/upload">
+                <ListItem button="true" component={Link} to="/upload">
                     <ListItemIcon>
                         <UploadFileIcon />
                     </ListItemIcon>
