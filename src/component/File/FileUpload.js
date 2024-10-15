@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 const FileUpload = () => {
-
     const [fileData, setFileData] = useState({
         name: '',
         type: '',
         data: null,
+        racId: '',
+        folderName: ''
     });
+
+    const [racIds, setRacIds] = useState([]); // State for RAC IDs
+    const [folderNames, setFolderNames] = useState([]); // State for Folder Names
+
+    useEffect(() => {
+        // Fetch RAC IDs and Folder Names from your API or hardcoded values
+        const fetchDropdownData = async () => {
+            try {
+                const racResponse = await axios.get('http://localhost:8080/api/racs'); // Update with your API endpoint
+                const folderResponse = await axios.get('http://localhost:8080/api/folders'); // Update with your API endpoint
+                setRacIds(racResponse.data);
+                setFolderNames(folderResponse.data);
+            } catch (error) {
+                console.error('Error fetching dropdown data:', error);
+            }
+        };
+
+        fetchDropdownData();
+    }, []);
 
     const handleUpload = async () => {
         try {
@@ -16,6 +36,8 @@ const FileUpload = () => {
             formData.append('name', fileData.name);
             formData.append('type', fileData.type);
             formData.append('data', new Blob([fileData.data]), fileData.name); // Wrap data in a Blob
+            formData.append('racId', fileData.racId); // Add RAC ID
+            formData.append('folderName', fileData.folderName); // Add Folder Name
 
             await axios.post('http://localhost:8080/api/files/upload', formData, {
                 headers: {
@@ -28,16 +50,17 @@ const FileUpload = () => {
                 name: '',
                 type: '',
                 data: null,
+                racId: '',
+                folderName: ''
             });
 
-            // fetchFiles(); // Refresh the file list
+            // fetchFiles(); // Refresh the file list if needed
         } catch (error) {
             console.error('Error uploading file:', error.response.data); // Log error response for debugging
         }
     };
 
     return (
-
         <div className="app-container">
             <Box
                 component="div"
@@ -52,11 +75,10 @@ const FileUpload = () => {
                     width: 400,
                     margin: '0 auto',
                     marginTop: 4,
-
                 }}
-
             >
                 <h2>Upload File</h2>
+
                 <TextField
                     label="File Name"
                     variant="outlined"
@@ -71,6 +93,39 @@ const FileUpload = () => {
                     value={fileData.type}
                     onChange={(e) => setFileData({ ...fileData, type: e.target.value })}
                 />
+
+                <FormControl fullWidth variant="outlined">
+                    <InputLabel id="rac-select-label">RAC ID</InputLabel>
+                    <Select
+                        labelId="rac-select-label"
+                        value={fileData.racId}
+                        onChange={(e) => setFileData({ ...fileData, racId: e.target.value })}
+                        label="RAC ID"
+                    >
+                        {racIds.map((rac) => (
+                            <MenuItem key={rac.id} value={rac.id}>
+                                {rac.name} {/* Adjust according to your rac object structure */}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <FormControl fullWidth variant="outlined">
+                    <InputLabel id="folder-select-label">Folder Name</InputLabel>
+                    <Select
+                        labelId="folder-select-label"
+                        value={fileData.folderName}
+                        onChange={(e) => setFileData({ ...fileData, folderName: e.target.value })}
+                        label="Folder Name"
+                    >
+                        {folderNames.map((folder) => (
+                            <MenuItem key={folder.id} value={folder.name}>
+                                {folder.name} {/* Adjust according to your folder object structure */}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
                 <Button
                     variant="contained"
                     component="label"
