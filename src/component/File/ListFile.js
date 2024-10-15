@@ -92,6 +92,18 @@ const ListFile = () => {
                     onChange={handleSearch} // Use handleSearch for filtering
                     margin="normal"
                 />
+                <TextField
+                    label="Enter racid"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                />
+                <TextField
+                    label="Enter folder name"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                />
             </Container>
 
             <TableContainer component={Paper}>
