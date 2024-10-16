@@ -7,20 +7,23 @@ const FileUpload = () => {
         name: '',
         type: '',
         data: null,
-        racId: '',
-        folderName: ''
+        racId: '',   // Holds the selected RAC ID
+        folderName: ''  // Holds the selected folder name
     });
 
-    const [racIds, setRacIds] = useState([]); // State for RAC IDs
-    const [folderNames, setFolderNames] = useState([]); // State for Folder Names
+    const [racIds, setRacIds] = useState([]);  // State to store RAC IDs fetched from the API
+    const [folderNames, setFolderNames] = useState([]);  // State to store folder names fetched from the API
 
+    // Fetch RAC IDs and Folder Names from the backend when the component mounts
     useEffect(() => {
-        // Fetch RAC IDs and Folder Names from your API or hardcoded values
         const fetchDropdownData = async () => {
             try {
-                const racResponse = await axios.get('http://localhost:8080/api/racs'); // Update with your API endpoint
-                const folderResponse = await axios.get('http://localhost:8080/api/folders'); // Update with your API endpoint
+                // Fetch RAC IDs
+                const racResponse = await axios.get('http://localhost:8080/api/rac');  // Update with correct API endpoint
                 setRacIds(racResponse.data);
+
+                // Fetch Folder Names
+                const folderResponse = await axios.get('http://localhost:8080/api/folder');  // Update with correct API endpoint
                 setFolderNames(folderResponse.data);
             } catch (error) {
                 console.error('Error fetching dropdown data:', error);
@@ -33,19 +36,20 @@ const FileUpload = () => {
     const handleUpload = async () => {
         try {
             const formData = new FormData();
-            formData.append('name', fileData.name);
-            formData.append('type', fileData.type);
-            formData.append('data', new Blob([fileData.data]), fileData.name); // Wrap data in a Blob
-            formData.append('racId', fileData.racId); // Add RAC ID
-            formData.append('folderName', fileData.folderName); // Add Folder Name
+            formData.append('name', fileData.name);  // File name
+            formData.append('type', fileData.type);  // File type
+            formData.append('data', new Blob([fileData.data]), fileData.name);  // File data as Blob
+            formData.append('racId', fileData.racId);  // Selected RAC ID
+            formData.append('folderName', fileData.folderName);  // Selected Folder Name
 
+            // Send file upload request
             await axios.post('http://localhost:8080/api/files/upload', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data', // Set the correct content type
+                    'Content-Type': 'multipart/form-data',  // Ensure the correct content type for file uploads
                 },
             });
 
-            // Reset file data
+            // Reset the form after successful upload
             setFileData({
                 name: '',
                 type: '',
@@ -53,10 +57,8 @@ const FileUpload = () => {
                 racId: '',
                 folderName: ''
             });
-
-            // fetchFiles(); // Refresh the file list if needed
         } catch (error) {
-            console.error('Error uploading file:', error.response.data); // Log error response for debugging
+            console.error('Error uploading file:', error.response.data);  // Log any errors that occur
         }
     };
 
@@ -79,6 +81,7 @@ const FileUpload = () => {
             >
                 <h2>Upload File</h2>
 
+                {/* File Name Input */}
                 <TextField
                     label="File Name"
                     variant="outlined"
@@ -86,6 +89,8 @@ const FileUpload = () => {
                     value={fileData.name}
                     onChange={(e) => setFileData({ ...fileData, name: e.target.value })}
                 />
+
+                {/* File Type Input */}
                 <TextField
                     label="File Type"
                     variant="outlined"
@@ -94,6 +99,7 @@ const FileUpload = () => {
                     onChange={(e) => setFileData({ ...fileData, type: e.target.value })}
                 />
 
+                {/* RAC ID Dropdown */}
                 <FormControl fullWidth variant="outlined">
                     <InputLabel id="rac-select-label">RAC ID</InputLabel>
                     <Select
@@ -103,13 +109,14 @@ const FileUpload = () => {
                         label="RAC ID"
                     >
                         {racIds.map((rac) => (
-                            <MenuItem key={rac.id} value={rac.id}>
-                                {rac.name} {/* Adjust according to your rac object structure */}
+                            <MenuItem key={rac.id} value={rac.racId}>
+                                {rac.racId}  {/* Assuming racId is the display value */}
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
+                {/* Folder Name Dropdown */}
                 <FormControl fullWidth variant="outlined">
                     <InputLabel id="folder-select-label">Folder Name</InputLabel>
                     <Select
@@ -119,13 +126,14 @@ const FileUpload = () => {
                         label="Folder Name"
                     >
                         {folderNames.map((folder) => (
-                            <MenuItem key={folder.id} value={folder.name}>
-                                {folder.name} {/* Adjust according to your folder object structure */}
+                            <MenuItem key={folder.id} value={folder.folderName}>
+                                {folder.folderName}  {/* Assuming folderName is the display value */}
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
+                {/* File Input */}
                 <Button
                     variant="contained"
                     component="label"
@@ -148,6 +156,8 @@ const FileUpload = () => {
                         }}
                     />
                 </Button>
+
+                {/* Upload Button */}
                 <Button
                     variant="contained"
                     color="primary"
