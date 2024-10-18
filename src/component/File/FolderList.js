@@ -176,7 +176,7 @@ const FolderList = () => {
                             fullWidth
                             variant="outlined"
                         />
-                        <FormControl fullWidth variant="outlined" style={{ marginTop: '16px' }}>
+                        <FormControl fullWidth variant="outlined" style={{ marginTop: '20px' }}>
                             <InputLabel>Rac ID</InputLabel>
                             <Select
                                 value={newRacId}

@@ -7,45 +7,52 @@ const FileUpload = () => {
         name: '',
         type: '',
         data: null,
-        racId: '',   // Holds the selected RAC ID
-        folderName: ''  // Holds the selected folder name
+        racId: '',
+        folderName: ''
     });
 
-    const [racIds, setRacIds] = useState([]);  // State to store RAC IDs fetched from the API
-    const [folderNames, setFolderNames] = useState([]);  // State to store folder names fetched from the API
+    const [racIds, setRacIds] = useState([]);
+    const [folderNames, setFolderNames] = useState([]);
 
-    // Fetch RAC IDs and Folder Names from the backend when the component mounts
+    // Fetch RAC IDs
     useEffect(() => {
-        const fetchDropdownData = async () => {
+        const fetchRacIds = async () => {
             try {
-                // Fetch RAC IDs
-                const racResponse = await axios.get('http://localhost:8080/api/rac');  // Update with correct API endpoint
+                const racResponse = await axios.get('http://localhost:8080/api/rac');
                 setRacIds(racResponse.data);
-
-                // Fetch Folder Names
-                const folderResponse = await axios.get('http://localhost:8080/api/folder');  // Update with correct API endpoint
-                setFolderNames(folderResponse.data);
             } catch (error) {
-                console.error('Error fetching dropdown data:', error);
+                console.error('Error fetching RAC IDs:', error);
             }
         };
 
-        fetchDropdownData();
+        fetchRacIds();
     }, []);
+
+    // Fetch folder names based on selected RAC ID
+    const handleRacIdChange = async (racId) => {
+        setFileData({ ...fileData, racId, folderName: '' });  // Reset folderName when RAC changes
+        try {
+            const folderResponse = await axios.get(`http://localhost:8080/api/folder/rac/${racId}`);
+            console.log("Folder API Response: ", folderResponse.data);  // Debugging log
+            setFolderNames(folderResponse.data);
+        } catch (error) {
+            console.error('Error fetching folder names:', error);
+            setFolderNames([]);  // Clear folders on error
+        }
+    };
 
     const handleUpload = async () => {
         try {
             const formData = new FormData();
-            formData.append('name', fileData.name);  // File name
-            formData.append('type', fileData.type);  // File type
-            formData.append('data', new Blob([fileData.data]), fileData.name);  // File data as Blob
-            formData.append('racId', fileData.racId);  // Selected RAC ID
-            formData.append('folderName', fileData.folderName);  // Selected Folder Name
+            formData.append('name', fileData.name);
+            formData.append('type', fileData.type);
+            formData.append('data', new Blob([fileData.data]), fileData.name);
+            formData.append('racId', fileData.racId);
+            formData.append('folderName', fileData.folderName);
 
-            // Send file upload request
             await axios.post('http://localhost:8080/api/files/upload', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',  // Ensure the correct content type for file uploads
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
@@ -58,7 +65,7 @@ const FileUpload = () => {
                 folderName: ''
             });
         } catch (error) {
-            console.error('Error uploading file:', error.response.data);  // Log any errors that occur
+            console.error('Error uploading file:', error.response.data);
         }
     };
 
@@ -105,31 +112,35 @@ const FileUpload = () => {
                     <Select
                         labelId="rac-select-label"
                         value={fileData.racId}
-                        onChange={(e) => setFileData({ ...fileData, racId: e.target.value })}
+                        onChange={(e) => handleRacIdChange(e.target.value)}
                         label="RAC ID"
                     >
                         {racIds.map((rac) => (
                             <MenuItem key={rac.id} value={rac.racId}>
-                                {rac.racId}  {/* Assuming racId is the display value */}
+                                {rac.racId}
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
                 {/* Folder Name Dropdown */}
-                <FormControl fullWidth variant="outlined">
-                    <InputLabel id="folder-select-label">Folder Name</InputLabel>
+                <FormControl fullWidth variant="outlined" disabled={!fileData.racId}>
+                    <InputLabel>Folder Name</InputLabel>
                     <Select
                         labelId="folder-select-label"
                         value={fileData.folderName}
                         onChange={(e) => setFileData({ ...fileData, folderName: e.target.value })}
                         label="Folder Name"
                     >
-                        {folderNames.map((folder) => (
-                            <MenuItem key={folder.id} value={folder.folderName}>
-                                {folder.folderName}  {/* Assuming folderName is the display value */}
-                            </MenuItem>
-                        ))}
+                        {folderNames.length > 0 ? (
+                            folderNames.map((folder) => (
+                                <MenuItem key={folder.id} value={folder.folderName}>
+                                    {folder.folderName}
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem disabled>No folders available</MenuItem>
+                        )}
                     </Select>
                 </FormControl>
 
@@ -163,6 +174,7 @@ const FileUpload = () => {
                     color="primary"
                     onClick={handleUpload}
                     fullWidth
+                    disabled={!fileData.racId || !fileData.folderName || !fileData.data}
                 >
                     Upload
                 </Button>
